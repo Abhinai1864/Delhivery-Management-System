@@ -4,7 +4,6 @@ import com.abhinai.backend.entity.Shipment;
 import com.abhinai.backend.exception.ShipmentNotFoundException;
 import com.abhinai.backend.repository.ShipmentRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service
@@ -24,20 +23,29 @@ public class ShipmentService {
         return shipmentRepository.findAll();
     }
 
-    public Shipment updateShipment(Long id, Shipment shipment){
+    public Shipment updateShipment(Long id, Shipment shipment) {
 
-        Shipment exisitingShipment = shipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Shipment not found with id:" +id));
+        Shipment existingShipment = shipmentRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ShipmentNotFoundException(
+                                "Shipment not found with id: " + id));
 
-        exisitingShipment.setCustomerName(shipment.getCustomerName());
-        exisitingShipment.setAddress(shipment.getAddress());
-        exisitingShipment.setStatus(shipment.getStatus());
+        existingShipment.setCustomerName(shipment.getCustomerName());
+        existingShipment.setAddress(shipment.getAddress());
+        existingShipment.setStatus(shipment.getStatus());
 
-        return shipmentRepository.save(exisitingShipment);
+        return shipmentRepository.save(existingShipment);
     }
 
-    public void deleteShipment(Long id){
-        shipmentRepository.deleteById(id);
+    public void deleteShipment(Long id) {
+
+        Shipment shipment = shipmentRepository.findById(id)
+                .orElseThrow(() ->
+                        new ShipmentNotFoundException(
+                                "Shipment not found with id: " + id));
+
+        shipmentRepository.delete(shipment);
     }
 
     public Shipment getShipmentById(Long id) {
@@ -46,6 +54,10 @@ public class ShipmentService {
                 .orElseThrow(() ->
                         new ShipmentNotFoundException(
                                 "Shipment not found with id: " + id));
+    }
+
+    public Shipment createShipment(Shipment shipment) {
+        return shipmentRepository.save(shipment);
     }
 }
 
